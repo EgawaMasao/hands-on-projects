@@ -1,0 +1,195 @@
+
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{booktabs}
+\geometry{margin=1in}
+
+\title{Lab 2: Sequence-to-Sequence Neural Machine Translation}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Objective}
+The goal of this lab is to implement a basic sequence-to-sequence (Seq2Seq)
+model for neural machine translation.
+
+After completing this lab, students should be able to:
+\begin{itemize}
+    \item Explain the role of the encoder and decoder.
+    \item Implement a GRU-based Seq2Seq model.
+    \item Train the model with teacher forcing.
+    \item Perform greedy decoding at inference time.
+    \item Evaluate translations using a simple exact-match accuracy or BLEU score.
+\end{itemize}
+
+\section{Background}
+A Seq2Seq model maps an input sentence
+\[
+x = (x_1, x_2, \dots, x_T)
+\]
+to an output sentence
+\[
+y = (y_1, y_2, \dots, y_{T'}).
+\]
+
+In the basic encoder--decoder formulation:
+\begin{itemize}
+    \item The \textbf{encoder} reads the source sentence and produces a hidden representation.
+    \item The \textbf{decoder} generates the target sentence token by token.
+\end{itemize}
+
+For this lab, we use GRU-based encoder and decoder modules.
+
+\section{Dataset}
+The dataset is a small English--Vietnamese parallel corpus stored in:
+\begin{itemize}
+    \item \texttt{data/train.en}
+    \item \texttt{data/train.vi}
+    \item \texttt{data/dev.en}
+    \item \texttt{data/dev.vi}
+\end{itemize}
+
+Students may reuse the vocabulary-building utilities from Lab 1.
+
+\section{Architecture}
+The model is defined as:
+\begin{enumerate}
+    \item Embed source tokens.
+    \item Encode the source sequence using a GRU.
+    \item Use the final encoder hidden state to initialize the decoder.
+    \item Generate target tokens step by step using the decoder GRU.
+    \item Apply a linear layer to obtain token logits.
+\end{enumerate}
+
+\section{Task 1: Data Preparation}
+Implement or reuse the following components:
+\begin{itemize}
+    \item tokenization
+    \item vocabulary construction
+    \item sentence encoding with \texttt{<BOS>} and \texttt{<EOS>}
+    \item mini-batch padding
+\end{itemize}
+
+\subsection*{Question}
+Why do we need \texttt{<BOS>} and \texttt{<EOS>} tokens in sequence generation?
+
+\section{Task 2: Encoder}
+Implement a GRU encoder:
+
+\begin{lstlisting}[language=Python]
+class Encoder(nn.Module):
+    def __init__(self, vocab_size, emb_dim, hidden_dim):
+        ...
+    def forward(self, x):
+        ...
+\end{lstlisting}
+
+The encoder should return:
+\begin{itemize}
+    \item all hidden states (optional for later labs)
+    \item the final hidden state
+\end{itemize}
+
+\section{Task 3: Decoder}
+Implement a GRU decoder:
+
+\begin{lstlisting}[language=Python]
+class Decoder(nn.Module):
+    def __init__(self, vocab_size, emb_dim, hidden_dim):
+        ...
+    def forward(self, token, hidden):
+        ...
+\end{lstlisting}
+
+At each decoding step, the decoder should:
+\begin{enumerate}
+    \item embed the previous token,
+    \item update the hidden state,
+    \item compute logits over the target vocabulary.
+\end{enumerate}
+
+\subsection*{Question}
+What probability distribution is modeled by the decoder at time step $t$?
+
+\section{Task 4: Seq2Seq Training}
+Implement the Seq2Seq forward pass with teacher forcing.
+
+Training objective:
+\[
+L = - \sum_{t=1}^{T'} \log p(y_t \mid y_{<t}, x)
+\]
+
+Use cross-entropy loss and train the model for several epochs.
+
+\subsection*{Question}
+What is teacher forcing? Why is it useful during training?
+
+\section{Task 5: Greedy Decoding}
+At inference time, generate the translation token by token using:
+\[
+\hat{y}_t = \arg\max_y p(y \mid \hat{y}_{<t}, x)
+\]
+
+Stop generation when:
+\begin{itemize}
+    \item \texttt{<EOS>} is produced, or
+    \item a maximum target length is reached.
+\end{itemize}
+
+\section{Task 6: Evaluation}
+Evaluate the model on the development set.
+You may report:
+\begin{itemize}
+    \item exact-match accuracy on the toy dataset, or
+    \item BLEU score if you choose to use NLTK.
+\end{itemize}
+
+\subsection*{Suggested output}
+For a few development examples, print:
+\begin{itemize}
+    \item source sentence
+    \item reference translation
+    \item model prediction
+\end{itemize}
+
+\section{Submission}
+Students must submit:
+\begin{itemize}
+    \item \texttt{lab2_seq2seq.ipynb}
+    \item a short PDF with answers to conceptual questions
+\end{itemize}
+
+\section{Grading}
+\begin{center}
+\begin{tabular}{lc}
+\toprule
+Task & Points \\
+\midrule
+Data preparation & 2 \\
+Encoder implementation & 2 \\
+Decoder implementation & 2 \\
+Seq2Seq forward + training & 2 \\
+Greedy decoding + evaluation & 2 \\
+\midrule
+Total & 10 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Expected Behavior}
+Because the dataset is very small, the model may overfit quickly.
+A correct implementation should show:
+\begin{itemize}
+    \item decreasing training loss,
+    \item reasonable translations for memorized sentence patterns,
+    \item better training behavior when teacher forcing is used.
+\end{itemize}
+
+\end{document}

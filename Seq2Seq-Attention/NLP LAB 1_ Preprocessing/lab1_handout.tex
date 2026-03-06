@@ -1,0 +1,89 @@
+
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=1in}
+
+\title{Lab 1: Text Preprocessing for Neural Machine Translation}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Objective}
+Understand preprocessing steps required for Neural Machine Translation:
+\begin{itemize}
+\item Tokenization
+\item Vocabulary construction
+\item Sentence encoding
+\item Subword tokenization concept (BPE)
+\end{itemize}
+
+\section{Dataset}
+Example pair:
+\begin{verbatim}
+English: I am a student
+Vietnamese: tôi là sinh viên
+\end{verbatim}
+
+Files:
+\begin{itemize}
+\item data/train.en
+\item data/train.vi
+\end{itemize}
+
+\section{Task 1: Tokenization}
+
+Example:
+\begin{verbatim}
+Input:
+"I am a student"
+
+Output:
+["i","am","a","student"]
+\end{verbatim}
+
+\begin{lstlisting}[language=Python]
+def tokenize(sentence):
+    return sentence.lower().split()
+\end{lstlisting}
+
+\section{Task 2: Vocabulary}
+
+Example mapping:
+
+\begin{verbatim}
+<PAD> -> 0
+<BOS> -> 1
+<EOS> -> 2
+i -> 3
+am -> 4
+student -> 5
+\end{verbatim}
+
+\section{Task 3: Sentence Encoding}
+
+Example:
+
+\begin{verbatim}
+Sentence:
+I am a student
+
+Encoded:
+[1,3,4,5,2]
+\end{verbatim}
+
+\section{Submission}
+
+Submit:
+\begin{itemize}
+\item lab1\_preprocessing.ipynb
+\item report.pdf
+\end{itemize}
+
+\end{document}
