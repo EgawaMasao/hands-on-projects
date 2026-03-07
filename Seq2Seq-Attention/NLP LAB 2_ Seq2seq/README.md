@@ -42,7 +42,7 @@ memorized translations on this toy corpus.
 Submit:
 
 - `lab2_seq2seq.ipynb`
-- `answers.pdf`
+- `report.pdf`
 
 ## Suggested Extension
 
